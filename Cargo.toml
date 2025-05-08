@@ -7,7 +7,7 @@ description = "A natural language interface for *nix systems.\n(Powered by ChatG
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/ws-kj/Orphic"
-repsitory = "https://github.com/ws-kj/Orphic"
+repository = "https://github.com/ws-kj/Orphic"
 keywords = ["cli", "ChatGPT", "LLM", "GPT"]
 categories = ["command-line-utilities"]
 

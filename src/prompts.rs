@@ -51,11 +51,42 @@ lazy_static! {
         You are a machine that translates the output of linux commands into 
         understandable but concise language.
         ",
-        "interpreter_user": "
-        This output was the result of the command. Translate the data in the 
-        output into understandable language. Be extremely concise but include
-        all data from the output. Don't mention the command, just translate 
-        the data.
-        "
+        "interpreter_user": "\n        This output was the result of the command. Translate the data in the \n        output into understandable language. Be extremely concise but include\n        all data from the output. Don't mention the command, just translate \n        the data.\n        "
     }); 
+}
+
+/// Retrieve a prompt string by key.
+///
+/// # Panics
+/// Panics if the provided key does not exist or the value is not a string.
+pub fn get_prompt(key: &'static str) -> &'static str {
+    assert!(PROMPTS[key].is_string(), "Prompt for key `{}` is not a string", key);
+    PROMPTS[key].as_str().expect("Prompt value should be a &str")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_prompt_valid_key() {
+        let prompt = get_prompt("assistant_system");
+        assert!(prompt.contains("terminal"));
+    }
+
+    #[test]
+    fn test_prompts_have_expected_keys() {
+        let expected_keys = vec![
+            "assistant_system",
+            "assistant_user",
+            "json_verify_system",
+            "json_verify_user",
+            "interpreter_system",
+            "interpreter_user"
+        ];
+        
+        for key in expected_keys {
+            assert!(PROMPTS.get(key).is_some(), "Missing expected key: {}", key);
+        }
+    }
 }

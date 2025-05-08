@@ -48,13 +48,14 @@ Other partitions and file systems are also listed with their
 respective usage percentages and mount points.
 ```
 
-`-d` or `--debug` will display the raw GPT text along with the regular output, even in unsafe mode.
+`-d` or `--debug` prints the raw GPT response *in addition* to the normal result so you can see exactly what the model produced.
+
 ```
 $ orphic -u -d count the lines of rust code in this directory excluding /target/.
 {"command": "find . -name target -prune -o -name '*.rs' -type f -print0 | xargs -0 wc -l"}
 61 ./src/prompts.rs
-     219 ./src/main.rs
-     280 total
+219 ./src/runner.rs
+280 total
 ```
 
 `-r` or `--repl` will start Orphic in a REPL environment.
@@ -65,6 +66,31 @@ wtmp begins Sat Mar 18 14:55
 orphic> quit
 $
 ```
+
+### Optional Zsh command-not-found integration
+Add the snippet below to the bottom of your `~/.zshrc` to let Orphic handle any *free-text* command you type.  When Zsh can't find a matching binary or alias, the handler checks whether you entered more than one word and, if so, forwards the whole line to Orphic.
+
+```zsh
+# Send unknown multi-word commands to Orphic
+command_not_found_handler() {
+  # If the user typed multiple words, treat the entire line as a natural-language task
+  if [[ "$1" == *' '* || $# -gt 1 ]]; then
+    orphic "$@"   # change to the exact binary name you installed
+    return $?      # propagate Orphic's exit status
+  fi
+
+  # Fallback to the standard message for single-word typos
+  print "zsh: command not found: $1" >&2
+  return 127
+}
+```
+
+**Benefits**
+1. Keeps your prompt clean – just type "*list my large downloads from last week*" and hit Enter.
+2. Falls back gracefully to Zsh's default behaviour for single-word typos.
+
+After editing `~/.zshrc`, run `source ~/.zshrc` or start a new terminal session.
+
 ### Usage tips and observations 
 Sometimes Orphic works. Sometimes it doesn't. GPT is inconsistent, and the prompts that I'm using leave a lot to be desired. Results seem to be better if you format your task as a command instead of a question ("list the currently open ports" instead of "what ports are currently open"). An error that often arises is that GPT will try to use commands or packages for a different OS/distribution, or will try to use tools that you don't currently have installed. A quick fix is to specify your OS if you think the task will require OS-specific tools, but I'm working on making Orphic more aware of which commands are at its disposal and which are not. 
 
